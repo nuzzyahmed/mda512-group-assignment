@@ -18,12 +18,10 @@ from sklearn.metrics import (
 )
 
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC  # <<< CHANGED: Import SVC for Support Vector Machine
+from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 
-# =========================
 # 1) Load dataset
-# =========================
 DATA_PATH = "tumordata.csv"
 df = pd.read_csv(DATA_PATH)
 df.drop(columns=["id", "Unnamed: 32"], inplace=True, errors="ignore")
@@ -35,9 +33,7 @@ print("Dataset shape:", df.shape)
 print("Class counts (0=Benign, 1=Malignant):")
 print(df["diagnosis"].value_counts())
 
-# =========================
 # 2) Features / Target
-# =========================
 X = df.drop(columns=["diagnosis"])
 y = df["diagnosis"]
 
@@ -48,31 +44,24 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=y
 )
 
-# =========================
 # 3) Models (use pipelines)
-# =========================
 models = {
     "Logistic Regression": Pipeline(steps=[
         ("scaler", StandardScaler()),
-        # Removed class_weight for a standard result
         ("model", LogisticRegression(max_iter=2000, random_state=42))
     ]),
     "SVM": Pipeline(steps=[
         ("scaler", StandardScaler()),
-        # Added SVM model
         ("model", SVC(kernel='rbf', probability=False, random_state=42))
     ]),
     "Random Forest": RandomForestClassifier(
         n_estimators=300,
         random_state=42,
         n_jobs=-1
-        # Removed class_weight for a standard result
     )
 }
 
-# =========================
 # 4) Train + Evaluate
-# =========================
 rows = []
 
 for name, model in models.items():
@@ -116,11 +105,7 @@ print(results_df)
 results_df.to_csv("model_performance_summary.csv", index=False)
 print("\nSaved: model_performance_summary.csv")
 
-# =========================
 # 5) Feature importance (Random Forest)
-# =========================
-# Need to access the model step in the pipeline if RF is in a pipeline
-# In this case, RF is standalone, so direct access is fine.
 rf_model = models["Random Forest"]
 importances = rf_model.feature_importances_
 
